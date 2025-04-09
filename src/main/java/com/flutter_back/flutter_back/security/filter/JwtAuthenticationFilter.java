@@ -46,11 +46,27 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             throws AuthenticationException {
         
         // 요청 메시지에서 아이디, 비밀번호 추출
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
+        // String username = request.getParameter("username");
+        // String password = request.getParameter("password");
 
-        log.info("username : " + username);
-        log.info("password : " + password);
+        // log.info(" :::: username : " + username);
+        // log.info(" :::: password : " + password);
+
+        String username;
+        String password;
+        
+        try{
+            ObjectMapper objectMapper = new ObjectMapper();
+            Users loginRequest = objectMapper.readValue(request.getInputStream(), Users.class);
+            username = loginRequest.getUsername();
+            password = loginRequest.getPassword();
+            log.info(" :::: username : " + username);   
+            log.info(" :::: password : " + password);
+
+        }catch(IOException e){
+            log.error("로그인 요청 처리 중 오류 발생 : " + e.getMessage());
+            throw new RuntimeException("로그인 요청 처리 중 오류 발생 : " + e.getMessage());
+        }   
 
         // 인증토큰 객체 생성
         Authentication authentication = new UsernamePasswordAuthenticationToken(username, password);
